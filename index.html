@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعلانات مواقع | عمر</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        
+        /* تصميم واجهة الترحيب في الموقع */
+        .welcome-screen { text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; }
+        .welcome-screen h1 { color: #1a73e8; margin-bottom: 10px; }
+        .welcome-screen p { color: #5f6368; line-height: 1.6; }
+
+        /* الزر العائم (الفقاعة) */
+        #chat-launcher { position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px; background: #1a73e8; border-radius: 50%; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: 0.3s; }
+        #chat-launcher:hover { transform: scale(1.1); }
+        #chat-launcher svg { fill: white; width: 32px; height: 32px; }
+
+        /* نافذة الدردشة الذكية */
+        #chat-window { position: fixed; bottom: 110px; left: 30px; width: 350px; height: 500px; background: white; border-radius: 20px; display: none; flex-direction: column; border: 1px solid #ddd; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
+        .header { background: #1a73e8; color: white; padding: 18px; text-align: center; font-weight: bold; font-size: 16px; position: relative; }
+        .close-chat { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 20px; }
+        
+        #msg-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f8f9fa; }
+        .msg { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; max-width: 80%; word-wrap: break-word; }
+        .user-m { background: #1a73e8; color: white; align-self: flex-start; border-bottom-right-radius: 2px; }
+        .bot-m { background: #e9ecef; color: #202124; align-self: flex-end; border-bottom-left-radius: 2px; }
+        
+        .input-bar { display: flex; padding: 15px; background: white; border-top: 1px solid #eee; }
+        input { flex: 1; border: 1px solid #ddd; padding: 12px 18px; border-radius: 25px; outline: none; font-size: 14px; }
+        #send-btn { background: #1a73e8; color: white; border: none; padding: 0 20px; border-radius: 25px; margin-right: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="welcome-screen">
+    <h1>إعلانات مواقع 🚀</h1>
+    <p>مرحباً بك في مشروع عمر لتصميم المواقع الذكية. نحن نساعد أصحاب المشاريع الصغيرة في حلب وكل مكان على بناء حضور رقمي قوي.</p>
+    <p style="font-size: 13px; color: #888;">اضغط على أيقونة الدردشة بالأسفل للتحدث مع مساعدنا الذكي.</p>
+</div>
+
+<div id="chat-launcher" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+</div>
+
+<div id="chat-window">
+    <div class="header">
+        مساعد عمر الذكي
+        <span class="close-chat" onclick="toggleChat()">×</span>
+    </div>
+    <div id="msg-container">
+        <div class="msg bot-m">أهلاً بك! أنا مساعد المبرمج عمر (16 سنة، من حلب). كيف يمكنني مساعدتك اليوم بخصوص مشروع "إعلانات مواقع"؟</div>
+    </div>
+    <div class="input-bar">
+        <input type="text" id="user-input" placeholder="اسألني عن خدماتنا أو عن عمر..." onkeypress="if(event.key==='Enter') processChat()">
+        <button id="send-btn" onclick="processChat()">إرسال</button>
+    </div>
+</div>
+
+<script>
+    const KEY = "AIzaSyAp_BjlWaapcx9ZzHocU8wygFGasCwAR8M";
+    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`;
+
+    const OMAR_PROMPT = "أنت المساعد الذكي لمشروع 'إعلانات مواقع'. صاحب المشروع هو عمر، مبرمج طموح عمره 16 عاماً من مدينة حلب في سوريا. أنت خبير في التعريف بخدمات عمر (تصميم مواقع، إعلانات، ذكاء اصطناعي). أجب دائماً باحترافية وبلهجة ودودة تفتخر بعمر.";
+
+    function toggleChat() {
+        const win = document.getElementById('chat-window');
+        win.style.display = (win.style.display === 'none' || win.style.display === '') ? 'flex' : 'none';
+    }
+
+    async function processChat() {
+        const input = document.getElementById('user-input');
+        const container = document.getElementById('msg-container');
+        const text = input.value.trim();
+        if (!text) return;
+
+        container.innerHTML += `<div class="msg user-m">${text}</div>`;
+        input.value = '';
+        
+        const botDiv = document.createElement('div');
+        botDiv.className = 'msg bot-m';
+        botDiv.innerText = "جاري التفكير...";
+        container.appendChild(botDiv);
+        container.scrollTop = container.scrollHeight;
+
+        try {
+            const response = await fetch(URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: OMAR_PROMPT + "\n\nسؤال الزائر: " + text }] }] })
+            });
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content) {
+                botDiv.innerText = data.candidates[0].content.parts[0].text;
+            } else {
+                botDiv.innerText = "أعتذر، حدثت مشكلة بسيطة. يرجى المحاولة مجدداً.";
+            }
+        } catch (e) {
+            botDiv.innerText = "خطأ في الاتصال. تأكد من الإنترنت.";
+        }
+        container.scrollTop = container.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
